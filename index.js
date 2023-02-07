@@ -5,6 +5,7 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import { User } from './models/user.js';
 import crypto from 'crypto';
+import cookieParser from 'cookie-parser';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(cors());
+app.use(cookieParser());
 
 app.get('/', function (req, res) {
   console.log('weed');
@@ -32,12 +34,17 @@ app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    //
     const hash = crypto.createHash('sha256').update(password).digest('hex');
     const user = await User.findOne({ username });
     if (!user) throw new Error('invalid credentials');
     if (user.password == hash) {
-      res.status(200).json(user);
+      res
+        .status(200)
+        .json({
+          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        });
     } else {
       throw new Error('invalid credentials');
     }

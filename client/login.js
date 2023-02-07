@@ -15,7 +15,16 @@ loginForm.addEventListener('submit', async function (event) {
       body: body,
     });
     if (!res.ok) throw new Error(await res.text());
-    window.location.href = '/';
+
+    const { username, firstName, lastName } = await res.json();
+    const maxAge = 900000;
+    const expires = new Date(Date.now() + maxAge).toUTCString();
+    document.cookie = `user=${JSON.stringify({
+      username,
+      firstName,
+      lastName,
+    })}; max-age=${maxAge}; expires=${expires}`;
+    window.location.href = '/rooms.html';
   } catch (error) {
     console.log(error);
     const errorMessage = document.createElement('span');
