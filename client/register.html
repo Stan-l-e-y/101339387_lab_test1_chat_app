@@ -9,8 +9,9 @@
   </head>
   <body class="flex flex-col justify-center items-center h-screen">
     <h1 class="text-3xl font-bold">Register</h1>
+    <div id="error"></div>
 
-    <form method="POST" class="flex flex-col">
+    <form method="POST" class="flex flex-col" id="register">
       <input
         class="border rounded-lg mt-6 p-2"
         placeholder="username"
@@ -54,5 +55,6 @@
       ></a
     >
     <div></div>
+    <script type="module" src="./register.js"></script>
   </body>
 </html>

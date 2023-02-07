@@ -3,6 +3,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import { User } from './models/user.js';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -24,6 +25,34 @@ app.use(cors());
 
 app.get('/', function (req, res) {
   console.log('weed');
+});
+
+app.post('/login', async (req, res) => {
+  //
+});
+
+app.post('/register', async (req, res) => {
+  const { username, firstName, lastName, password } = req.body;
+
+  try {
+    const findUser = User.findOne({ username });
+    if (findUser) {
+      throw new Error('User already exists');
+    }
+
+    const user = new User({
+      username,
+      firstName,
+      lastName,
+      password,
+    });
+
+    await user.save();
+    res.status(200).send({ user });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e.message);
+  }
 });
 
 const httpServer = createServer(app);
