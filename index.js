@@ -22,10 +22,14 @@ app.use(express.json());
 
 app.use(cors());
 
+app.get('/', function (req, res) {
+  console.log('weed');
+});
+
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: ['http://127.0.0.1:5500/'],
+    origin: ['http://localhost:8082'],
   },
 });
 
@@ -36,28 +40,24 @@ try {
 
   mongoConnect();
 
-  io.on('connection', (socket) => {
-    console.log('yo mama');
-    io.emit('newconnection', 'new user joined');
-    socket.emit('message', 'Welcome to ');
-    socket.on('disconnect', function () {
-      io.emit('disconnect', 'user has disconnect');
-      console.log('A client disconnected');
-    });
-
-    socket.on('newmessage', function (message) {
-      console.log(message);
-      io.emit('message', message);
-    });
-  });
-
   //   app.listen(PORT, () => console.log(`listening on port ${PORT}`));
 } catch (err) {
   console.error(err);
 }
 
-// app.get('/', function (req, res) {
-//   res.sendFile(path.join(__dirname, 'src/index.html'));
-// });
+io.on('connection', (socket) => {
+  console.log('yo mama');
+  io.emit('newconnection', 'new user joined');
+  socket.emit('message', 'Welcome to ');
+  socket.on('disconnect', function () {
+    io.emit('disconnect', 'user has disconnect');
+    console.log('A client disconnected');
+  });
+
+  socket.on('newmessage', function (message) {
+    console.log(message);
+    io.emit('message', message);
+  });
+});
 
 httpServer.listen(PORT, () => console.log(`listening on port ${PORT}`));
