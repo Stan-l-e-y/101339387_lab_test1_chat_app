@@ -18,3 +18,16 @@ function getCookie(cname) {
   }
   return '';
 }
+
+const roomsForm = document.getElementById('rooms');
+const errorDiv = document.getElementById('error');
+
+roomsForm.addEventListener('submit', async function (event) {
+  event.preventDefault();
+
+  const formData = new FormData(roomsForm);
+  const { username, roomsList } = Object.fromEntries(formData);
+  //   console.log(Object.fromEntries(formData));
+
+  window.location.href = `/chat.html?room=${roomsList}&username=${username}`;
+});

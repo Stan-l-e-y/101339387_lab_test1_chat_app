@@ -38,13 +38,11 @@ app.post('/login', async (req, res) => {
     const user = await User.findOne({ username });
     if (!user) throw new Error('invalid credentials');
     if (user.password == hash) {
-      res
-        .status(200)
-        .json({
-          username: user.username,
-          firstName: user.firstName,
-          lastName: user.lastName,
-        });
+      res.status(200).json({
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      });
     } else {
       throw new Error('invalid credentials');
     }
@@ -91,17 +89,20 @@ try {
 }
 
 io.on('connection', (socket) => {
-  console.log('yo mama');
   io.emit('newconnection', 'new user joined');
   socket.emit('message', 'Welcome to ');
-  socket.on('disconnect', function () {
-    io.emit('disconnect', 'user has disconnect');
-    console.log('A client disconnected');
+  // socket.on('disconnect', function () {
+  //   io.emit('disconnect', 'user has disconnect');
+  //   console.log('A client disconnected');
+  // });
+
+  socket.on('send-message', (message, room, username) => {
+    socket.to(room).emit('receive-message', message, username);
   });
 
-  socket.on('newmessage', function (message) {
-    console.log(message);
-    io.emit('message', message);
+  socket.on('join-room', (room, cb) => {
+    socket.join(room);
+    cb(`Joined the ${room} channel`);
   });
 });
 
