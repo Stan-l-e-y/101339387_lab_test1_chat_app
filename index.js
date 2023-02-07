@@ -29,7 +29,21 @@ app.get('/', function (req, res) {
 });
 
 app.post('/login', async (req, res) => {
-  //
+  const { username, password } = req.body;
+
+  try {
+    //
+    const hash = crypto.createHash('sha256').update(password).digest('hex');
+    const user = await User.findOne({ username });
+    if (!user) throw new Error('invalid credentials');
+    if (user.password == hash) {
+      res.status(200).json(user);
+    } else {
+      throw new Error('invalid credentials');
+    }
+  } catch (e) {
+    res.status(400).send(e.message);
+  }
 });
 
 app.post('/register', async (req, res) => {
@@ -43,7 +57,7 @@ app.post('/register', async (req, res) => {
       lastName,
       password: hash,
     });
-    res.status(200).send({ user });
+    res.status(200).json({ user });
   } catch (e) {
     console.log(e);
     res.status(400).send(e.message);
