@@ -89,12 +89,12 @@ try {
 }
 
 io.on('connection', (socket) => {
+  console.log('yeee');
   io.emit('newconnection', 'new user joined');
   socket.emit('message', 'Welcome to ');
-  // socket.on('disconnect', function () {
-  //   io.emit('disconnect', 'user has disconnect');
-  //   console.log('A client disconnected');
-  // });
+  socket.on('disconnect', () => {
+    console.log('A client disconnected');
+  });
 
   socket.on('send-message', (message, room, username) => {
     socket.to(room).emit('receive-message', message, username);

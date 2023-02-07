@@ -6,6 +6,9 @@ const params = new Proxy(new URLSearchParams(window.location.search), {
 
 const chat = document.getElementById('chat');
 const roomName = document.getElementById('roomName');
+const logout = document.getElementById('logout');
+const leave = document.getElementById('leave');
+
 let roomParam = params.room ? params.room : 'Room';
 roomName.innerHTML = roomParam.toUpperCase();
 const username = params.username
@@ -29,7 +32,6 @@ chat.addEventListener('submit', async (e) => {
 
   const formData = new FormData(chat);
   const { messageInput } = Object.fromEntries(formData);
-  //   console.log(messageInput);
   if (messageInput === '') return;
   displayMessage(messageInput, username);
   socket.emit('send-message', messageInput, roomParam, username);
@@ -59,3 +61,15 @@ function getCookie(cname) {
   }
   return '';
 }
+
+leave.addEventListener('click', (e) => {
+  socket.disconnect();
+  window.location.href = `/rooms.html`;
+});
+
+logout.addEventListener('click', (e) => {
+  document.cookie = `user=; max-age=0; expires=0`;
+  socket.disconnect();
+
+  window.location.href = `/`;
+});
