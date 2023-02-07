@@ -4,6 +4,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import { User } from './models/user.js';
+import crypto from 'crypto';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -35,19 +36,13 @@ app.post('/register', async (req, res) => {
   const { username, firstName, lastName, password } = req.body;
 
   try {
-    const findUser = User.findOne({ username });
-    if (findUser) {
-      throw new Error('User already exists');
-    }
-
-    const user = new User({
+    const hash = crypto.createHash('sha256').update(password).digest('hex');
+    const user = await User.create({
       username,
       firstName,
       lastName,
-      password,
+      password: hash,
     });
-
-    await user.save();
     res.status(200).send({ user });
   } catch (e) {
     console.log(e);

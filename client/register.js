@@ -15,9 +15,7 @@ registerForm.addEventListener('submit', async function (event) {
       body: body,
     });
     if (!res.ok) throw new Error(await res.text());
-    // console.log(await res.text());
-    const json = await res.json();
-    console.log(json);
+    window.location.href = '/';
   } catch (error) {
     console.log(error);
     const errorMessage = document.createElement('span');
