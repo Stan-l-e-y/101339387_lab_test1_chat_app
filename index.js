@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = path.dirname(__filename);
-const PORT = 8000;
+const PORT = 3000;
 const MONGODB_URI =
   'mongodb+srv://ThisIsForSchool:lSaFPLvHIk2bPCCz@cluster0.mtqaf6e.mongodb.net/test?retryWrites=true&w=majority';
 
@@ -22,9 +22,11 @@ app.use(express.json());
 
 app.use(cors());
 
-const httpServer = createServer();
+const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  // ...
+  cors: {
+    origin: ['http://127.0.0.1:5500/'],
+  },
 });
 
 try {
@@ -35,6 +37,7 @@ try {
   mongoConnect();
 
   io.on('connection', (socket) => {
+    console.log('yo mama');
     io.emit('newconnection', 'new user joined');
     socket.emit('message', 'Welcome to ');
     socket.on('disconnect', function () {
@@ -48,7 +51,13 @@ try {
     });
   });
 
-  app.listen(PORT, () => console.log(`listening on port ${PORT}`));
+  //   app.listen(PORT, () => console.log(`listening on port ${PORT}`));
 } catch (err) {
   console.error(err);
 }
+
+// app.get('/', function (req, res) {
+//   res.sendFile(path.join(__dirname, 'src/index.html'));
+// });
+
+httpServer.listen(PORT, () => console.log(`listening on port ${PORT}`));
