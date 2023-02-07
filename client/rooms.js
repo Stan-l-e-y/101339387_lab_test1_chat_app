@@ -27,7 +27,6 @@ roomsForm.addEventListener('submit', async function (event) {
 
   const formData = new FormData(roomsForm);
   const { username, roomsList } = Object.fromEntries(formData);
-  //   console.log(Object.fromEntries(formData));
 
   window.location.href = `/chat.html?room=${roomsList}&username=${username}`;
 });

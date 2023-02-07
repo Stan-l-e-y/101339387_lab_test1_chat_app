@@ -18,8 +18,12 @@ const username = params.username
 const socket = io('http://localhost:3000');
 
 socket.on('connect', () => {
-  socket.emit('join-room', roomParam, (message) => {
-    socket.emit('send-message', message, roomParam, username);
+  socket.emit('join-room', roomParam, username, async (message) => {
+    const messages = await getMessages(roomParam.toLowerCase());
+
+    if (messages && messages.length > 0) await displayAllMessages(messages);
+
+    socket.emit('send-message', message, roomParam, username, false);
   });
 });
 
@@ -73,3 +77,23 @@ logout.addEventListener('click', (e) => {
 
   window.location.href = `/`;
 });
+
+async function getMessages(room) {
+  const res = await fetch(`http://localhost:3000/${room}/messages`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  const data = await res.json();
+
+  return data;
+}
+
+async function displayAllMessages(messages) {
+  messages.forEach((message) => {
+    const div = document.createElement('div');
+    div.textContent += `\n ${message.from_user}: ${message.message}\n`;
+    document.getElementById('message-container').append(div);
+  });
+}

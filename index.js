@@ -4,6 +4,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import { User } from './models/user.js';
+import { GroupMessage } from './models/groupMessage.js';
 import crypto from 'crypto';
 import cookieParser from 'cookie-parser';
 
@@ -26,8 +27,17 @@ app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
 
-app.get('/', function (req, res) {
-  console.log('weed');
+app.get('/:room/messages', async function (req, res) {
+  try {
+    const room = req.params.room;
+    console.log(room);
+
+    const messages = await GroupMessage.find({ room });
+    res.status(200).json(messages);
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e.message);
+  }
 });
 
 app.post('/login', async (req, res) => {
@@ -82,25 +92,27 @@ try {
   };
 
   mongoConnect();
-
-  //   app.listen(PORT, () => console.log(`listening on port ${PORT}`));
 } catch (err) {
   console.error(err);
 }
 
 io.on('connection', (socket) => {
-  console.log('yeee');
-  io.emit('newconnection', 'new user joined');
-  socket.emit('message', 'Welcome to ');
   socket.on('disconnect', () => {
     console.log('A client disconnected');
   });
 
-  socket.on('send-message', (message, room, username) => {
+  socket.on('send-message', async (message, room, username, persist = true) => {
+    try {
+      if (persist) {
+        await GroupMessage.create({ from_user: username, room, message });
+      }
+    } catch (e) {
+      console.log(e);
+    }
     socket.to(room).emit('receive-message', message, username);
   });
 
-  socket.on('join-room', (room, cb) => {
+  socket.on('join-room', (room, username, cb) => {
     socket.join(room);
     cb(`Joined the ${room} channel`);
   });
